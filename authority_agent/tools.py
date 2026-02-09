@@ -22,8 +22,15 @@ from langchain_core.prompts import ChatPromptTemplate
 class TriggerAnalyzer:
     # ✅ FIX: Default file is now the authority triggers file.
     def __init__(self,openai_client, trigger_file: str = "authority_triggers.xlsx"):
+
+        base_path = Path(__file__).parent
+        trigger_path = base_path / trigger_file
+
+        if not trigger_path.exists():
+            raise FileNotFoundError(f"Trigger file not found at {trigger_path}")
+            
         try:
-            self.df = pd.read_excel(trigger_file)
+            self.df = pd.read_excel(trigger_path)
         except FileNotFoundError:
             st.error(f"Error: The trigger file '{trigger_file}' was not found. Please ensure it is in the correct directory.")
             self.df = pd.DataFrame(columns=["Trigger", "Reaction", "Rating"]) # Create empty dataframe to prevent crash
